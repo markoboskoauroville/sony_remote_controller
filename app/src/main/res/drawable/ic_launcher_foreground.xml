@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A camera body with a lens and a small wave over it: a camera reached through the air. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:strokeColor="#F2DDB4" android:strokeWidth="2.6" android:strokeLineJoin="round"
+        android:pathData="M37,44 L45,44 L48,39 L60,39 L63,44 L71,44 L71,68 L37,68 Z" />
+    <path android:strokeColor="#F59E0B" android:strokeWidth="2.6"
+        android:pathData="M54,56 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+    <path android:strokeColor="#33D17A" android:strokeWidth="2.2" android:strokeLineCap="round"
+        android:pathData="M47,33 Q54,28 61,33" />
+</vector>

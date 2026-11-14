@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sony Remote (Mantra)</title>
+<meta name="description" content="An Android app, not yet built: several Sony Alpha cameras on one phone, each with its own picture, switched with one key, and a multiview that shows what is live.">
+<meta property="og:title" content="Sony Remote (Mantra)">
+<meta property="og:description" content="Several Sony cameras, one phone, one pair of hands. The app drawn before it is built.">
+<meta property="og:image" content="https://mantrasonyremote.pages.dev/img/hero.jpg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;1,300&family=IBM+Plex+Sans:wght@300;500&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #0d0a0b; --card: rgba(30,22,20,.72); --edge: rgba(224,162,87,.20);
+    --ink: #f2ece4; --ink2: #b9ad9d; --quiet: #85796f;
+    --brass: #e0a257; --brass-hi: #f3c97a; --cushion: #a8432f;
+    /* the app's own language (CAMERA): colour is the state */
+    --c-ground: #0B0D10; --c-sand: #F2DDB4; --c-on: #33D17A; --c-off: #7A8087;
+    --c-armed: #E8A33D; --c-dead: #33383E; --c-live: #FF3B30;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--ink); background: var(--night);
+    font: 300 17px/1.7 "IBM Plex Sans", system-ui, sans-serif;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(60vw 50vh at 85% 0%, rgba(224,162,87,.14), transparent 70%),
+      radial-gradient(50vw 60vh at 0% 45%, rgba(168,67,47,.12), transparent 70%),
+      radial-gradient(70vw 40vh at 50% 100%, rgba(224,162,87,.08), transparent 70%);
+  }
+  a { color: var(--brass-hi); }
+  b, strong { font-weight: 500; color: var(--ink); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  h1, h2, h3 { font-family: Spectral, Georgia, serif; font-weight: 300; margin: 0; }
+  h1 { font-size: clamp(42px, 7vw, 76px); line-height: 1.02; }
+  h1 em, h2 em { color: var(--brass); }
+  h2 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.15; margin-bottom: 14px; }
+  h3 { font-size: 23px; margin-bottom: 6px; }
+  .eyebrow { font: 400 11px/1 "IBM Plex Mono", monospace; letter-spacing: .26em; text-transform: uppercase; color: var(--brass); margin-bottom: 16px; }
+  section { padding: 84px 0; }
+  p { margin: 0 0 14px; color: var(--ink2); }
+  .lead { font-size: 19px; color: var(--ink2); max-width: 36em; }
+  .card { background: var(--card); border: 1px solid var(--edge); border-radius: 22px; padding: 26px; box-shadow: 0 24px 60px rgba(0,0,0,.45); }
+  .quiet { color: var(--quiet); font-size: 14.5px; }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--brass-hi); box-shadow: 0 0 10px var(--brass); margin-right: 8px; vertical-align: middle; }
+
+  /* hero */
+  header { padding: 56px 0 30px; }
+  .hero { display: grid; grid-template-columns: 1fr 1.15fr; gap: 44px; align-items: center; }
+  .hero .status { font-size: 14.5px; color: var(--quiet); margin-top: 22px; }
+  .photo { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--edge); box-shadow: 0 30px 80px rgba(0,0,0,.6); background: radial-gradient(circle at 30% 30%, rgba(224,162,87,.22), rgba(30,22,20,.9) 70%); aspect-ratio: 16/10; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo .wait { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; font: 400 11px/1.6 "IBM Plex Mono", monospace; letter-spacing: .2em; text-transform: uppercase; color: var(--quiet); }
+  .photo img + .wait { display: none; }
+
+  /* the page order (MANTRA_MANIFEST app-page-order.md): banner, introduction, lifestyle, technical, donation */
+  header.top { padding: 24px 0 30px; }
+  .banner { position: relative; border-radius: 22px; overflow: hidden; margin: 0 0 30px; background: #000; border: 1px solid var(--edge); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .banner > img { display: block; width: 100%; height: auto; aspect-ratio: 1920 / 1071; object-fit: cover; }
+  .banner .over { position: absolute; left: 0; right: 0; bottom: 0; padding: 60px 26px 22px;
+                  background: linear-gradient(transparent, rgba(0,0,0,.84)); display: flex; gap: 18px; align-items: center; }
+  .banner .over img { width: 64px; height: 64px; flex: none; }
+  .banner h1 { font-size: clamp(34px, 5.5vw, 60px); }
+  .banner .by { color: var(--ink2); font-size: 15px; margin-top: 6px; }
+  .life { border-radius: 22px; overflow: hidden; margin: 36px 0 0; }
+  .life img { display: block; width: 100%; height: auto; }
+  @media (max-width: 600px) { .banner .over { position: static; background: rgba(30,22,20,.95); padding: 16px; } }
+
+  /* principles */
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .num { font: 400 11px/1 "IBM Plex Mono", monospace; letter-spacing: .22em; color: var(--brass); margin-bottom: 12px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ---------- the app, drawn: the CAMERA language ---------- */
+  .phone {
+    width: 100%; max-width: 900px; margin: 26px auto 0; aspect-ratio: 20/9;
+    background: var(--c-ground); border-radius: 34px; padding: 1.4%;
+    border: 1px solid #2a2a2e; box-shadow: 0 0 0 7px #151517, 0 34px 90px rgba(0,0,0,.75), 0 0 60px rgba(224,162,87,.10);
+    display: grid; grid-template-columns: 1fr 16fr 1fr; gap: 1.2%;
+    font-family: "IBM Plex Mono", ui-monospace, monospace; container-type: inline-size;
+  }
+  .rail { display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; gap: 2px; }
+  .key { background: none; border: 0; padding: 4px 0; cursor: pointer; font: 700 clamp(7px, 1.45cqw, 13px)/1.1 "IBM Plex Mono", monospace; letter-spacing: .04em; color: var(--c-off); text-align: center; position: relative; }
+  .key small { display: block; font-weight: 400; font-size: .72em; opacity: .62; letter-spacing: 0; }
+  .key.on { color: var(--c-on); }
+  .key.dead { color: var(--c-dead); cursor: default; }
+  .key.armed { color: var(--c-armed); }
+  .key.tally::after { content: ""; position: absolute; top: 1px; right: -5px; width: 5px; height: 5px; border-radius: 50%; background: var(--c-live); box-shadow: 0 0 6px var(--c-live); }
+  .rec { width: clamp(16px, 3.2cqw, 30px); aspect-ratio: 1; border-radius: 50%; border: 2px solid #C8CDD2; display: grid; place-items: center; cursor: pointer; background: none; padding: 0; }
+  .rec::before { content: ""; width: 42%; aspect-ratio: 1; border-radius: 50%; background: var(--c-live); }
+  .rec.rolling { background: var(--c-live); border-color: var(--c-live); }
+  .rec.rolling::before { background: transparent; }
+  .stage { position: relative; aspect-ratio: 16/9; align-self: center; background: #000; overflow: hidden; border-radius: 3px; }
+  .pic { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity .25s; }
+  .pic .lbl { position: absolute; left: 10px; bottom: 8px; font-size: clamp(6px, 1.2cqw, 11px); color: rgba(255,255,255,.55); letter-spacing: .14em; }
+  .line { position: absolute; top: 6px; left: 0; right: 0; text-align: center; font-size: clamp(6px, 1.05cqw, 10px); color: #fff; }
+  .line span { background: rgba(0,0,0,.47); padding: 2px 8px; border-radius: 6px; }
+  .tc { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: clamp(6px, 1.15cqw, 11px); color: #fff; }
+  .tc i { font-style: normal; color: var(--c-off); }
+  .tc.rolling i { color: var(--c-live); }
+  /* scenes stand in for pictures until the photographs are made */
+  .s1 { background: url(img/cam1.jpg) center/cover, #1a120d; }
+  .s2 { background: url(img/cam2.jpg) center/cover, #1a120d; }
+  .s3 { background: url(img/cam3.jpg) center/cover, #1a120d; }
+  .s4 { background: radial-gradient(circle at 30% 55%, #c27a3a 0 5%, transparent 20%), radial-gradient(ellipse at 50% 60%, #2b231f, #0a0808 70%); }
+  .s5 { background: radial-gradient(circle at 70% 60%, #b9874f 0 6%, transparent 22%), radial-gradient(ellipse at 50% 60%, #33261d, #0b0908 70%); }
+
+  /* multiview */
+  .mv { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; background: #000; }
+  .tile { position: relative; cursor: pointer; outline: 2px solid transparent; outline-offset: -2px; }
+  .tile .pic { inset: 0; }
+  .tile .name { position: absolute; left: 0; bottom: 0; font-size: clamp(6px, 1.1cqw, 10px); letter-spacing: .1em; color: #fff; background: rgba(0,0,0,.6); padding: 2px 7px; }
+  .tile.pvw { outline-color: var(--c-on); }
+  .tile.pvw .name { background: var(--c-on); color: #000; }
+  .tile.pgm { outline-color: var(--c-live); }
+  .tile.pgm .name { background: var(--c-live); }
+  .tile.out { cursor: default; }
+  .tile.out .name { background: var(--c-live); }
+  .tile.out::after { content: "PROGRAM"; position: absolute; top: 4px; right: 6px; font-size: clamp(6px, 1cqw, 9px); color: var(--c-live); letter-spacing: .14em; }
+  .sbs { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; align-items: center; background: #000; }
+  .sbs .tile { aspect-ratio: 16/9; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center; margin-top: 18px; font: 400 12px/1.4 "IBM Plex Mono", monospace; color: var(--ink2); }
+  .legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; background: var(--k); vertical-align: -1px; }
+  .try { text-align: center; color: var(--quiet); font-size: 14px; margin-top: 8px; }
+  .toggle { display: flex; justify-content: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .toggle button { font: 400 12px/1 "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--ink2); background: rgba(255,240,220,.035); border: 1px solid rgba(255,255,255,.07); border-radius: 999px; padding: 11px 16px; cursor: pointer; }
+  .toggle button.chosen { color: #22150a; background: linear-gradient(90deg, #f6d394, #e0a257); border-color: transparent; box-shadow: 0 0 0 1px rgba(243,201,122,.55), 0 0 22px rgba(224,162,87,.28); }
+
+  /* tables */
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: top; }
+  th { font: 400 11px/1.3 "IBM Plex Mono", monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--brass); font-weight: 400; }
+  td { color: var(--ink2); }
+  td:first-child { color: var(--ink); white-space: nowrap; }
+  .scroll { overflow-x: auto; }
+
+  /* diagrams */
+  svg.dia { width: 100%; height: auto; display: block; }
+  svg.dia text { font-family: "IBM Plex Mono", monospace; fill: var(--ink2); }
+  svg.dia .t-big { fill: var(--ink); font-size: 15px; }
+  svg.dia .t-small { font-size: 11.5px; fill: var(--quiet); }
+  svg.dia .box { fill: rgba(30,22,20,.9); stroke: rgba(224,162,87,.35); }
+  svg.dia .wifi { stroke: var(--brass); stroke-width: 2; fill: none; }
+  svg.dia .ble { stroke: #7fb2d9; stroke-width: 1.6; fill: none; stroke-dasharray: 5 5; }
+  svg.dia .hdmi { stroke: #8a8178; stroke-width: 2.2; fill: none; }
+  .key-line { display: flex; flex-wrap: wrap; gap: 6px 22px; font: 400 12px/1.6 "IBM Plex Mono", monospace; color: var(--ink2); margin-top: 12px; }
+  .key-line i { display: inline-block; width: 26px; height: 0; border-top: 2px solid var(--c); vertical-align: middle; margin-right: 8px; }
+  .key-line i.d { border-top-style: dashed; }
+
+  ol.road { list-style: none; counter-reset: r; padding: 0; margin: 0; }
+  ol.road li { counter-increment: r; position: relative; padding: 0 0 22px 58px; }
+  ol.road li::before { content: counter(r, decimal-leading-zero); position: absolute; left: 0; top: 2px; font: 400 12px/1 "IBM Plex Mono", monospace; letter-spacing: .2em; color: var(--brass); }
+  ol.road li.now::before { color: var(--brass-hi); text-shadow: 0 0 10px var(--brass); }
+  ol.road b { display: block; color: var(--ink); font-weight: 500; }
+
+  .kit { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 22px; }
+  .kit .card { display: flex; flex-direction: column; }
+  .kit .card p { flex: 1; }
+  .kit .price { font: 400 12px/1 "IBM Plex Mono", monospace; letter-spacing: .14em; color: var(--brass); margin-bottom: 12px; }
+  .alphas { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-top: 18px; }
+  .alpha-group { grid-column: 1 / -1; font: 400 12px/1 "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); margin-top: 18px; }
+  .alpha { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(224,162,87,.28); background: rgba(255,255,255,.02); }
+  .alpha:hover { border-color: #e0a257; }
+  .alpha .code { font: 400 12px/1.3 "IBM Plex Mono", monospace; opacity: .6; }
+  .alpha .state { font-size: 13px; color: #8fd19e; }
+  .alpha .state.used { color: #e0a257; }
+  .alpha .go { font-size: 13px; opacity: .8; margin-top: 4px; }
+  .buy { align-self: flex-start; text-decoration: none; font: 500 15px/1 "IBM Plex Sans", sans-serif; color: #22150a; background: linear-gradient(90deg, #f6d394, #e0a257); padding: 13px 20px; border-radius: 999px; box-shadow: 0 6px 22px rgba(224,162,87,.25); }
+  @media (max-width: 860px) { .kit { grid-template-columns: 1fr; } }
+  footer { padding: 50px 0 70px; color: var(--quiet); font-size: 14px; border-top: 1px solid rgba(255,255,255,.05); }
+
+  @media (max-width: 860px) {
+    .hero, .grid2 { grid-template-columns: 1fr; }
+    .grid3 { grid-template-columns: 1fr; }
+    section { padding: 60px 0; }
+    .phone { border-radius: 20px; box-shadow: 0 0 0 4px #151517, 0 20px 50px rgba(0,0,0,.7); }
+  }
+</style>
+<script src="https://speechifykeys.pages.dev/speechify-keys.js" defer></script>
+<script src="https://mantra-visits.marko-bosko-925.workers.dev/counter.js" defer></script>
+<script src="https://mantra-downloads.marko-bosko-925.workers.dev/counter.js" defer></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+  <!-- 1. the banner: the app at work -->
+  <div class="banner">
+    <img src="img/hero.jpg" alt="A sound healing evening filmed by three Sony cameras, the filmmaker holding a phone that shows all three" width="1920" height="1071">
+    <div class="over">
+      <img src="favicon.svg" alt="">
+      <div>
+        <h1>Mantra <em>Sony Remote</em></h1>
+        <div class="by">Several Sony cameras, one phone, one pair of hands · Android</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. the introduction -->
+  <p class="lead">Three Sony cameras, one phone, one pair of hands. Each camera's picture on the phone, a key to jump between them, and a multiview that shows what is live and what is next. TC Jam works today: the phone keeps every camera in time and starts them together; the camera switcher is still being designed.</p>
+  <a class="cta" data-dl-app="mantra-sony-remote" href="download/SonyRemote.apk" download style="display:inline-block;margin-top:8px;padding:14px 22px;border-radius:12px;background:#FFB020;color:#000;font-weight:700;text-decoration:none">Download the beta, v<span class="app-version">28</span> (Android, <span class="app-size">21</span> MB) →</a>
+  <p class="status quiet" style="margin-top:16px"><span class="dot"></span>Beta for testers: v<span class="app-version">28</span>, <span class="app-date">29.10.2026</span> · Android 10 or newer, 64-bit · <span class="app-size">21</span> MB</p>
+
+  <!-- 3. the lifestyle picture -->
+  <div class="life"><img src="img/lifestyle.jpg" alt="A filmmaker at a candle-lit sound healing concert stands between two Sony cameras on tripods with transmitters, looking at the camera grid on his phone" width="1024" height="765" loading="lazy"></div>
+  </div>
+</header>
+
+<!-- 4. the technical part -->
+
+
+<section id="beta">
+  <div class="wrap">
+    <div class="eyebrow">Beta v<span class="app-version">28</span> · for testers</div>
+    <h2>TC Jam: <em>one phone keeps every camera in time</em></h2>
+    <p class="lead">The first part of the app that works on real cameras (an α7 V and an α6600, 29.10.2026). Since 31.10.2026 it also lives inside <a href="https://mantramanualcamera.pages.dev" target="_blank" rel="noopener">Manual Camera (Mantra)</a> (Settings → SONY): its top line shows whether the Sonys record, holding REC offers START SONY for all of them and the phone together, and every phone take carries the same free-run time code. The <a href="#alphas">Sony Alpha bodies</a>, new and used, are listed below. The phone becomes a time code generator, starts every camera together, and claps for the edit.</p>
+    <div class="grid3" style="margin-top:34px">
+      <div class="card"><div class="num">01</div><h3>Read a camera's screen</h3><p>Point the phone at any camera showing its time code, drag the box onto the numbers, pinch to zoom. The phone reads them on the phone itself (no internet) and locks its own clock to that camera: the numbers turn green when they run together.</p></div>
+      <div class="card"><div class="num">02</div><h3>Send the phone's time code over USB</h3><p>Plug a camera into the phone and press PHONE TC GENERATOR > CAMERA (USB): it gets the same time code, Free Run, at the turn of a second. Works on the newer Sony bodies (α7 V, α7 IV, α1, FX3, FX30, ZV-E1 and others; the full list is under HELP in the app). The α6600 and older bodies are read from their screen instead.</p></div>
+      <div class="card"><div class="num">03</div><h3>Record together, clap together</h3><p>Over Bluetooth one key starts and stops every camera, and each camera confirms it is recording. SYNC CAMERA REC BUTTONS: press REC on one camera and the others follow. CLAP (after REC, or CLAP NOW by hand): 1, 2, 3 kHz and then all three, the phone's LED flashing one frame with each.</p></div>
+    </div>
+    <p class="lead" style="margin-top:28px">Installing: open the download on an Android phone (64-bit, Android 10 or newer) and allow your browser to install apps. On each camera: MENU → Network → Bluetooth → Bluetooth Rmt Ctrl: On, then pair; for USB, the camera's USB connection on PC Remote (α7 V: USB PORT 1, Remote Shoot/Trn.). The version numbers only grow, in whole numbers, and this button always gives the newest. Tell Marko what worked and what did not.</p>
+    <a class="cta" data-dl-app="mantra-sony-remote" href="download/SonyRemote.apk" download style="display:inline-block;margin-top:18px;padding:14px 22px;border-radius:12px;background:#FFB020;color:#000;font-weight:700;text-decoration:none">Download the beta, v<span class="app-version">28</span> →</a>
+  </div>
+</section>
+
+<section id="idea">
+  <div class="wrap">
+    <div class="eyebrow">The idea</div>
+    <h2>One person, several cameras,<br><em>like jazz musicians</em></h2>
+    <p class="lead">A gong bath, a concert, a talk on a boat: Marko often films alone or with a small crew, with three or more Sony cameras running and an Accsoon transmitter on each. The phone becomes the monitor and the remote for all of them.</p>
+    <div class="grid3" style="margin-top:34px">
+      <div class="card"><div class="num">01</div><h3>The picture is sacred</h3><p>The keys live in the black bands beside the 16:9 picture, never on it. A key is a word; its colour is its state.</p></div>
+      <div class="card"><div class="num">02</div><h3>One key, one camera</h3><p>The lens keys of Manual Camera (Mantra) become camera keys: CAM 1, CAM 2, CAM 3. One tap and you see and steer that camera.</p></div>
+      <div class="card"><div class="num">03</div><h3>One experiment at a time</h3><p>Each piece is tried on the real cameras, then kept, changed or dropped, and written in the experiment log. Nothing is built ahead.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="rail">
+  <div class="wrap">
+    <div class="eyebrow">The camera rail</div>
+    <h2>The lens switcher, <em>now a camera switcher</em></h2>
+    <p class="lead">Same place, same logic as the L1 to L5 keys in Manual Camera (Mantra). Under each key, in a whisper, the body it is. Green is the camera you are on. Grey is connected and waiting. Dark is a key with no camera behind it. A small red dot is the camera on air.</p>
+
+    <div class="phone" id="railPhone">
+      <div class="rail" id="camRail">
+        <button class="key on" data-cam="1">CAM1<small>A7 V</small></button>
+        <button class="key" data-cam="2">CAM2<small>a6600</small></button>
+        <button class="key" data-cam="3">CAM3<small>A7 IV</small></button>
+        <button class="key dead" data-cam="4">CAM4<small>—</small></button>
+        <button class="key dead" data-cam="5">CAM5<small>—</small></button>
+        <button class="key" id="srcKey">SONY<small>direct</small></button>
+        <button class="key" id="mvKey">MULTI<small>view</small></button>
+      </div>
+      <div class="stage" id="railStage">
+        <div class="pic s1" data-p="1"><span class="lbl">CAM 1 · WIDE</span></div>
+        <div class="line"><span id="railLine">CAM1 · A7 V · Sony direct · 25 fps · ISO 800 · 1/50 · f/2.8</span></div>
+        <div class="tc" id="railTc"><i>REC</i> 00:00:00:00</div>
+      </div>
+      <div class="rail">
+        <button class="rec" id="recKey" aria-label="record"></button>
+        <button class="key">SNAP</button>
+        <button class="key">ISO<small>800</small></button>
+        <button class="key">SHTR<small>1/50</small></button>
+        <button class="key">IRIS<small>f/2.8</small></button>
+        <button class="key">PEAK</button>
+        <button class="key">FULL</button>
+      </div>
+    </div>
+    <div class="legend">
+      <span style="--k:var(--c-on)">the camera you are on</span>
+      <span style="--k:var(--c-off)">connected, waiting</span>
+      <span style="--k:var(--c-dead)">no camera on this key</span>
+      <span style="--k:var(--c-live)">on air (program)</span>
+    </div>
+    <p class="try">Try it: tap CAM1, CAM2, CAM3. Tap SONY to swap the picture source, REC to roll.</p>
+
+    <div class="grid2" style="margin-top:40px">
+      <div class="card"><h3>Two sources per camera</h3><p><b>Sony direct</b>: the camera's own Wi-Fi picture and every setting (ISO, shutter, iris, white balance, tap to focus, photo, record). <b>Accsoon</b>: the clean HDMI picture from the CineView on the camera, with the everyday keys (record, shutter, focus) over Bluetooth at the same time. A double tap in the middle of the picture opens SOURCES, as in Mantra Monitor.</p></div>
+      <div class="card"><h3>What a key does in each source</h3><p>A key the current source cannot honour stays where it is and turns dark. ISO is dark in Accsoon mode, and REC still works there over Bluetooth. Your thumb always finds each key in the same place.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="multiview">
+  <div class="wrap">
+    <div class="eyebrow">Multiview</div>
+    <h2>Three cameras and the program, <em>at one glance</em></h2>
+    <p class="lead">Borrowed from OBS Studio, vMix and the ATEM switchers: the screen splits into four. Three quarters are the cameras, one quarter is what goes out. A red border and a red label mean live, on program. A green border means preview, the next shot waiting.</p>
+
+    <div class="toggle" id="mvMode">
+      <button class="chosen" data-m="quad">Three cameras + program</button>
+      <button data-m="two">Two-camera switcher</button>
+    </div>
+
+    <div class="phone" id="mvPhone">
+      <div class="rail" id="mvRail">
+        <button class="key" data-cam="1">CAM1</button>
+        <button class="key" data-cam="2">CAM2</button>
+        <button class="key" data-cam="3">CAM3</button>
+        <button class="key dead">CAM4</button>
+        <button class="key dead">CAM5</button>
+      </div>
+      <div class="stage">
+        <div class="mv" id="quad">
+          <div class="tile" data-cam="1"><div class="pic s1"></div><span class="name">CAM1 · A7 V</span></div>
+          <div class="tile out"><div class="pic" id="pgmPic"></div><span class="name" id="pgmName">PGM</span></div>
+          <div class="tile" data-cam="2"><div class="pic s2"></div><span class="name">CAM2 · a6600</span></div>
+          <div class="tile" data-cam="3"><div class="pic s3"></div><span class="name">CAM3 · A7 IV</span></div>
+        </div>
+        <div class="sbs" id="two" hidden>
+          <div class="tile pvw" id="pvwTile"><div class="pic"></div><span class="name">PREVIEW · CAM2</span></div>
+          <div class="tile pgm" id="pgmTile"><div class="pic"></div><span class="name">PROGRAM · CAM1</span></div>
+        </div>
+      </div>
+      <div class="rail">
+        <button class="key armed" id="cutKey">CUT</button>
+        <button class="key" id="autoKey">AUTO<small>0.5s</small></button>
+        <button class="rec" aria-label="record"></button>
+        <button class="key">FULL</button>
+      </div>
+    </div>
+    <div class="legend">
+      <span style="--k:var(--c-live)">program, live</span>
+      <span style="--k:var(--c-on)">preview, next</span>
+      <span style="--k:var(--c-armed)">CUT, ready</span>
+    </div>
+    <p class="try">Try it: tap a camera to put it on preview, then CUT. In the two-camera switcher, CUT swaps preview and program.</p>
+
+    <div class="grid3" style="margin-top:40px">
+      <div class="card"><h3>Where program sits</h3><p>Top right, as in OBS and ATEM, where the program is always on the right. The cameras read in order: CAM1 top left, then CAM2 and CAM3 along the bottom.</p></div>
+      <div class="card"><h3>Tally on every tile</h3><p>The camera on air carries a red outline, and the camera on preview a green one. The same red dot sits on its key in the rail, so the state is the same everywhere.</p></div>
+      <div class="card"><h3>Solo or with a director</h3><p>Two ways to try: preview, then CUT (a director's habit), or one tap straight to program (a solo shooter's). We keep the one that feels right in the hand.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="network">
+  <div class="wrap">
+    <div class="eyebrow">Connections</div>
+    <h2>One phone has <em>one Wi-Fi radio</em></h2>
+    <p class="lead">Each camera's Direct Wi-Fi and each CineView Nano is its own little network, and a phone is on one network at a time. So the newer cameras join one shared network, the phone's hotspot or a small travel router, and the phone talks to all of them there. Bluetooth is a separate radio: every camera also gets its keys over it.</p>
+    <div class="card" style="margin-top:30px" id="netCard">
+      <svg class="dia" viewBox="0 0 1000 430" role="img" aria-label="Diagram: the phone hotspot, three Sony cameras joining it over Wi-Fi, Bluetooth links to each camera, and Accsoon transmitters on HDMI">
+        <!-- phone -->
+        <rect class="box" x="400" y="20" width="200" height="86" rx="16"/>
+        <text class="t-big" x="500" y="56" text-anchor="middle">PHONE</text>
+        <text class="t-small" x="500" y="80" text-anchor="middle">hotspot or travel router</text>
+        <!-- cameras -->
+        <g id="cams">
+          <rect class="box" x="60" y="250" width="220" height="90" rx="14"/>
+          <text class="t-big" x="170" y="288" text-anchor="middle">CAM1 · A7 V</text>
+          <text class="t-small" x="170" y="312" text-anchor="middle">joins the shared network</text>
+          <rect class="box" x="390" y="250" width="220" height="90" rx="14"/>
+          <text class="t-big" x="500" y="288" text-anchor="middle">CAM2 · a6600</text>
+          <text class="t-small" x="500" y="312" text-anchor="middle">Bluetooth keys, Accsoon picture</text>
+          <rect class="box" x="720" y="250" width="220" height="90" rx="14"/>
+          <text class="t-big" x="830" y="288" text-anchor="middle">CAM3 · A7 IV</text>
+          <text class="t-small" x="830" y="312" text-anchor="middle">joins the shared network</text>
+        </g>
+        <!-- wifi -->
+        <path class="wifi" d="M460 106 C 400 180, 200 180, 170 250"/>
+        <path class="wifi" d="M520 106 C 640 170, 640 330, 570 392"/>
+        <path class="wifi" d="M540 106 C 600 180, 800 180, 830 250"/>
+        <!-- ble -->
+        <path class="ble" d="M420 100 C 330 160, 150 170, 120 250"/>
+        <path class="ble" d="M480 106 C 470 170, 470 200, 470 250"/>
+        <path class="ble" d="M580 100 C 670 160, 850 170, 880 250"/>
+        <!-- accsoon -->
+        <g opacity=".45"><rect class="box" x="100" y="370" width="140" height="44" rx="10"/><text x="170" y="397" text-anchor="middle" font-size="12">CineView Nano</text></g>
+        <rect class="box" x="430" y="370" width="140" height="44" rx="10"/><text x="500" y="397" text-anchor="middle" font-size="12">CineView Nano</text>
+        <g opacity=".45"><rect class="box" x="760" y="370" width="140" height="44" rx="10"/><text x="830" y="397" text-anchor="middle" font-size="12">CineView Nano</text></g>
+        <path class="hdmi" d="M170 340 L170 370 M500 340 L500 370 M830 340 L830 370"/>
+      </svg>
+      <div class="key-line">
+        <span><i style="--c:var(--brass)"></i>Wi-Fi: picture and every setting</span>
+        <span><i class="d" style="--c:#7fb2d9"></i>Bluetooth: record, shutter, focus, always</span>
+        <span><i style="--c:#8a8178"></i>HDMI: the clean picture into the Accsoon</span>
+      </div>
+      <p class="quiet" style="margin:14px 0 0">The pale Accsoons are not reached by this phone: a phone holds one Nano at a time. A Nano feeds up to four phones, so a second operator can watch any camera on their own phone.</p>
+    </div>
+    <div class="grid3" style="margin-top:22px" id="topologies">
+      <div class="card"><div class="num">ONE CAMERA</div><h3>Straight to the camera</h3><p>The phone joins the camera's Direct Wi-Fi, or the Accsoon's. The simplest start, and the first experiment.</p></div>
+      <div class="card"><div class="num">SEVERAL CAMERAS</div><h3>One shared network</h3><p>The phone's hotspot or a small travel router. The A7 IV and A7 V join it as for a computer's Remote Shoot; each gets its own address and sends its picture, so the multiview fills from the network. The a6600 cannot join: it comes in through its Accsoon and Bluetooth.</p></div>
+      <div class="card"><div class="num">ALWAYS</div><h3>Bluetooth beside it</h3><p>A Bluetooth link to every camera for the everyday keys. It keeps working when Wi-Fi is busy with pictures.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="cameras">
+  <div class="wrap">
+    <div class="eyebrow">Which cameras</div>
+    <h2>From the a6600 <em>to the A7 V</em></h2>
+    <p class="lead">Sony's remote protocol, Camera Remote Command, covers both. The A7 V speaks its newer PTP 3 over a cable or the network. The a6600 speaks the older PTP 2, and only over a USB cable, so on its own it is steered by cable or by Bluetooth, and its picture comes through its Accsoon.</p>
+    <div class="card scroll" style="margin-top:28px" id="tiers">
+      <table>
+        <tr><th>Tier</th><th>Bodies</th><th>Over Wi-Fi</th><th>Over Bluetooth</th></tr>
+        <tr><td>Network</td><td>A7 V, A7 IV (and the newer A7C II, a6700, FX3)</td><td>on the shared network: picture, every setting, record, photo, tap to focus, several at once</td><td>record, shutter, focus, zoom</td></tr>
+        <tr><td>Cable</td><td>a6600 (and a6400, a6100)</td><td>Sony's protocol reaches it only by USB cable (PTP 2); over Wi-Fi only on its own network, one camera at a time; its picture through its Accsoon</td><td>record, shutter, focus</td></tr>
+        <tr><td>Picture</td><td>any camera with HDMI</td><td>the clean picture through its Accsoon, one Nano per phone</td><td>Sony bodies: record, shutter, focus</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="kit">
+  <div class="wrap">
+    <div class="eyebrow">The kit</div>
+    <h2>What the app <em>is built around</em></h2>
+    <p class="lead">An Accsoon CineView Nano on each camera, and for several cameras a small router that every camera and the phone join.</p>
+    <div class="photo" style="margin-top:26px;aspect-ratio:16/9"><img src="img/kit.jpg" alt="A Sony camera on a small tripod with a wireless transmitter on its hot shoe and a coiled HDMI cable; a phone and a small travel router on linen beside it" loading="lazy"></div>
+    <div class="kit">
+      <div class="card"><div class="price">ABOUT €121</div><h3>Accsoon CineView Nano</h3><p>The camera's clean HDMI picture to the phone, 1080p60 on 5 GHz, about 60 ms, up to 150 m. One on each camera; up to four phones can watch one Nano.</p><a class="buy" href="https://www.amazon.de/dp/B0CJYJ1SW2?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+      <div class="card"><div class="price">ABOUT €107</div><h3>GL.iNet Beryl AX travel router</h3><p>The shared network for several cameras: pocket-sized, Wi-Fi 6 on 5 GHz, runs from a USB-C power bank. Every camera keeps a fixed address.</p><a class="buy" href="https://www.amazon.de/dp/B0BPSGJN7T?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+      <div class="card"><div class="price">ABOUT €42</div><h3>Anker USB-C hub with Ethernet</h3><p>For the cable road: the a6600 over USB, a wired network, and power for the phone through the hub while it works.</p><a class="buy" href="https://www.amazon.de/dp/B08CKXNJZS?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+    </div>
+    <div class="kit">
+      <div class="card"><div class="price">ABOUT €16</div><h3>Coiled micro HDMI cable</h3><p>From the camera to the Nano on its hot shoe: short, coiled, angled, nothing to snag. Micro HDMI suits the a6600 and a6700; the A7 bodies take a full-size HDMI cable.</p><a class="buy" href="https://www.amazon.de/dp/B09PYT3JS6?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+      <div class="card"><div class="price">ABOUT €24</div><h3>SmallRig phone holder</h3><p>The phone on a tripod or a cold shoe, turning freely, so the multiview stands beside you while you film.</p><a class="buy" href="https://www.amazon.de/dp/B09S5TP48T?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+      <div class="card" style="background:transparent;box-shadow:none;border-style:dashed"><h3>One per camera</h3><p>Three cameras: three Nanos and three cables, one router and one phone. The phone holds one Nano at a time and the network cameras all at once.</p></div>
+    </div>
+    <h3 style="margin-top:44px">The cameras</h3>
+    <p class="quiet">Bodies that join the shared network with Sony's newer protocol, so the multiview fills from them directly. </p>
+    <div class="kit">
+      <div class="card"><div class="price">ABOUT €1,990</div><h3>Sony Alpha 7 IV</h3><p>Full frame, 4K 60p. Remote control over a cable, its own Wi-Fi or the shared network, with live view: the full tier.</p><a class="buy" href="https://www.amazon.de/dp/B0B49LMMHB?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+      <div class="card"><div class="price">ABOUT €1,311</div><h3>Sony Alpha 6700</h3><p>The a6600's successor, APS-C, 4K 120p. Unlike the a6600 it joins the shared network, so it is a full multiview camera.</p><a class="buy" href="https://www.amazon.de/dp/B0CB8T476W?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+      <div class="card"><div class="price">ABOUT €121 EACH</div><h3>and a Nano on each</h3><p>The clean HDMI picture of any camera, the a6600 too, and the picture for a second operator's phone.</p><a class="buy" href="https://www.amazon.de/dp/B0CJYJ1SW2?tag=markomantresh-21" target="_blank" rel="noopener sponsored">On Amazon.de →</a></div>
+    </div>
+    <h3 style="margin-top:44px" id="alphas">Every Sony Alpha it works with</h3>
+    <p class="quiet">Each link is the camera's own page on Amazon.de, the one that stays: new, used and Amazon Warehouse offers all gather there, so a body Sony no longer makes (the a6000 to the a6600, the early A7s) shows whatever used stock comes in, batch after batch. REC over Bluetooth needs Network → Bluetooth → Bluetooth Rmt Ctrl in the camera's menu; a body without it (the a6000 and the other older ones) still takes the screen reader and the clap.</p>
+    <div class="alphas">
+      <div class="alpha-group">Full frame</div>
+      <a class="alpha" href="https://www.amazon.de/dp/B08V226T8Q?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α1</b><span class="code">ILCE-1</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0CMV98DP2?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α9 III</b><span class="code">ILCE-9M3</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B083P4J47N?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α9 II</b><span class="code">ILCE-9M2</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0G6CF32X9?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7 V</b><span class="code">ILCE-7M5</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B09JPCB3WR?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7 IV</b><span class="code">ILCE-7M4</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B07B4L1PQ8?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7 III</b><span class="code">ILCE-7M3</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B00Q2KEUFI?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7 II</b><span class="code">ILCE-7M2</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B08DP4NKGN?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7S III</b><span class="code">ILCE-7SM3</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B015XT4TGS?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7S II</b><span class="code">ILCE-7SM2</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0BKLQFFSF?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7R V</b><span class="code">ILCE-7RM5</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B09GPX2RKG?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7R IV</b><span class="code">ILCE-7RM4</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B07WSRSS8K?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7R IV (first listing)</b><span class="code">ILCE-7RM4</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0BJW68ZTT?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7R IIIA</b><span class="code">ILCE-7RM3A</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0779M1L8L?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7R III</b><span class="code">ILCE-7RM3</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B010THXVNQ?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7R II</b><span class="code">ILCE-7RM2</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B07Y5CFMH6?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7R II, renewed</b><span class="code">ILCE-7RM2</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B08J2FYYYT?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7C</b><span class="code">ILCE-7C</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0CGF84WQM?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7C II</b><span class="code">ILCE-7CM2</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0CGTVF6HS?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α7CR</b><span class="code">ILCE-7CR</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <div class="alpha-group">APS-C, the 6000 series</div>
+      <a class="alpha" href="https://www.amazon.de/dp/B0CB8T476W?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6700</b><span class="code">ILCE-6700</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B07X78SMWP?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6600</b><span class="code">ILCE-6600</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B01M2WAE29?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6500</b><span class="code">ILCE-6500</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0DPN81YLD?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6400 (A, today's)</b><span class="code">ILCE-6400A</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B07MZK5F3G?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6400 (2019)</b><span class="code">ILCE-6400</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B01BMAIE86?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6300</b><span class="code">ILCE-6300</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0DPN615YM?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6100 (A, today's)</b><span class="code">ILCE-6100A</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B07X5DKB1S?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6100 (2019)</b><span class="code">ILCE-6100</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B00IE9XHCM?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6000, black</b><span class="code">ILCE-6000</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B00IEYENZC?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony α6000, silver</b><span class="code">ILCE-6000</span><span class="state used">used and renewed, refilled on this page</span><span class="go">Amazon.de →</span></a>
+      <div class="alpha-group">Cinema Line and ZV</div>
+      <a class="alpha" href="https://www.amazon.de/dp/B0F7RXXGH1?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony FX3A</b><span class="code">ILME-FX3A</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0BGQGBW8J?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony FX30 with XLR grip</b><span class="code">ILME-FX30</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0BZPSV75D?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony ZV-E1</b><span class="code">ZV-E1</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B0D8QQVXJ1?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony ZV-E10 II</b><span class="code">ZV-E10M2</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+      <a class="alpha" href="https://www.amazon.de/dp/B098LWQPRT?tag=markomantresh-21" target="_blank" rel="noopener sponsored"><b>Sony ZV-E10</b><span class="code">ZV-E10</span><span class="state">new</span><span class="go">Amazon.de →</span></a>
+    </div>
+    <p class="quiet" style="margin-top:16px">Prices on Amazon.de, October 2026. Check the price on more than one site before you buy.</p>
+  </div>
+</section>
+
+<section id="road">
+  <div class="wrap">
+    <div class="eyebrow">The road</div>
+    <h2>One experiment <em>at a time</em></h2>
+    <div class="grid2" style="margin-top:30px">
+      <ol class="road">
+        <li class="now"><b>This page</b>The app drawn and agreed, before code.</li>
+        <li><b>One A7 V, Sony direct</b>Picture and record from one camera.</li>
+        <li><b>One Accsoon</b>The CineView picture, record over Bluetooth.</li>
+        <li><b>The a6600</b>Its own Wi-Fi, its USB cable, its Bluetooth keys: what each gives, measured.</li>
+      </ol>
+      <ol class="road" style="counter-reset: r 4">
+        <li><b>Two cameras on one network</b>The hotspot, two keys, switching.</li>
+        <li><b>Three cameras and multiview</b>The four tiles, preview and program.</li>
+        <li><b>The switcher</b>CUT and AUTO, with the tally everywhere.</li>
+        <li><b>In the field</b>A real session, then keep, change or drop.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- THE MANTRA PAYMENT GATEWAY, the donation bowl (MANTRA_MANIFEST modules/donation-bowl.md, payment-links.md).
+     Step 1, on the page: only the title and the Tibetan bowl (a photoreal Nano Banana Pro render).
+     Step 2, after a tap: the bowl rings (a singing bowl synthesised in the browser, nothing downloaded), fades away, and
+     the giving panel takes its place: a "Give with Revolut" button, his Revolut QR code, a way back to the bowl.
+     Paste this block into the page; put tibetan-bowl.jpg and revolut-qr.png in the page's img/ folder.
+     Self-contained: its own styles (scoped to .mantra-bowl) and script; no library, no tracking. -->
+<!-- My studio setup: the gear page (Marko, 1.11.2026) -->
+<div class="studio-link" style="text-align:center;margin:8px 0 0"><a href="https://studiosetupmantra.pages.dev" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:12px;border:1px solid currentColor;text-decoration:none;font-weight:700;color:var(--brass-hi)">My studio setup →</a><p style="margin:8px 0 0;font-size:14px;opacity:.7">The gear these apps are made with · affiliate links on Amazon.de</p></div>
+<!-- 5. the donation bowl -->
+<section id="donate" class="mantra-bowl" data-revolut="https://revolut.me/mbosko0612" aria-label="Help build Sony Remote (Mantra)">
+  <style>
+    .mantra-bowl { --brass: #f3c97a; --glow: rgba(255, 196, 120, .45); --card: #292c2f; text-align: center; padding: 64px 16px; }
+    .mantra-bowl h2 { margin: 0 0 26px; }
+    .mantra-bowl .stage { position: relative; display: grid; place-items: center; min-height: 380px; aspect-ratio: auto; background: none; overflow: visible; border-radius: 0; }
+    .mantra-bowl .stage > * { grid-area: 1 / 1; transition: opacity .9s ease, transform .9s ease; }
+    .mantra-bowl .bowl { background: none; border: 0; padding: 0; cursor: pointer; position: relative; color: inherit; font: inherit; -webkit-tap-highlight-color: transparent; }
+    .mantra-bowl .bowl:focus-visible { outline: 2px solid var(--brass); outline-offset: 8px; border-radius: 24px; }
+    .mantra-bowl .bowl img { width: min(360px, 82vw); height: auto; display: block; border-radius: 24px; transition: transform .4s ease, filter .4s ease; }
+    .mantra-bowl .hint { display: block; margin-top: 16px; font-size: 15px; letter-spacing: .06em; opacity: .75; }
+    .mantra-bowl .bowl:hover img { transform: translateY(-3px); filter: brightness(1.08); }
+    .mantra-bowl .ring { position: absolute; left: 50%; top: 36%; width: 60%; aspect-ratio: 3 / 1; border: 2px solid var(--glow); border-radius: 50%;
+      transform: translate(-50%, -50%) scale(.6); opacity: 0; pointer-events: none; }
+    .mantra-bowl.ringing .ring { animation: mantra-bowl-ring 2.4s ease-out forwards; }
+    .mantra-bowl.ringing .ring.r2 { animation-delay: .5s; }
+    .mantra-bowl.ringing .ring.r3 { animation-delay: 1s; }
+    @keyframes mantra-bowl-ring { 0% { opacity: .9; transform: translate(-50%, -50%) scale(.6); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); } }
+    /* step 2: the bowl gives way to the panel */
+    .mantra-bowl.giving .bowl { opacity: 0; transform: scale(.94); pointer-events: none; }
+    .mantra-bowl .panel { opacity: 0; transform: translateY(14px); pointer-events: none; width: min(420px, 92vw); }
+    .mantra-bowl.giving .panel { opacity: 1; transform: none; pointer-events: auto; transition-delay: .35s; }
+    .mantra-bowl .give { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 18px 22px; border-radius: 999px;
+      background: linear-gradient(90deg, #f3c97a, #fff0c4, #f3c97a); color: #1a1206; font-weight: 700; font-size: 17px; text-decoration: none;
+      box-shadow: 0 0 30px var(--glow); box-sizing: border-box; }
+    .mantra-bowl .qr { margin: 22px auto 0; background: var(--card); border-radius: 22px; padding: 22px; width: min(260px, 70vw); box-sizing: border-box; }
+    .mantra-bowl .qr img { width: 100%; height: auto; display: block; }
+    .mantra-bowl .small { font-size: 14px; opacity: .7; margin: 14px 0 0; }
+    .mantra-bowl .back { background: none; border: 0; color: inherit; opacity: .6; font-size: 14px; margin-top: 18px; cursor: pointer; text-decoration: underline; }
+    @media (prefers-reduced-motion: reduce) { .mantra-bowl.ringing .ring { animation: none; } .mantra-bowl .stage > * { transition: none; } }
+  </style>
+  <div class="eyebrow">Help build it</div>
+  <h2>Put something in the bowl</h2>
+  <p class="quiet" style="max-width:560px;margin:-10px auto 26px">The app is not built yet. Every gift goes into its development: the experiments on the road above, the cameras to test with, the hours of coding. Give what feels right and help bring Sony Remote (Mantra) to life.</p>
+  <div class="stage">
+    <button type="button" class="bowl" aria-label="Ring the bowl to give">
+      <span class="ring"></span><span class="ring r2"></span><span class="ring r3"></span>
+      <img src="img/tibetan-bowl.jpg" alt="A Tibetan singing bowl on a red cushion, coins inside" width="900" height="900">
+      <span class="hint">Click on the bowl to donate</span>
+    </button>
+    <div class="panel" aria-hidden="true">
+      <a class="give" href="https://revolut.me/mbosko0612" target="_blank" rel="noopener">Give with Revolut →</a>
+      <p class="small">Any amount, by card or Revolut. No Revolut account needed. It goes straight to Marko, for the development of the app.</p>
+      <div class="qr"><img src="img/revolut-qr.png" alt="Revolut QR code for @mbosko0612" width="620" height="760"></div>
+      <p class="small">On a computer? Scan it with your phone.</p>
+      <button type="button" class="back">back to the bowl</button>
+    </div>
+  </div>
+  <script>
+  (() => {
+    const box = document.currentScript.closest('.mantra-bowl');
+    const bowl = box.querySelector('.bowl'), panel = box.querySelector('.panel');
+    box.querySelector('.give').href = box.dataset.revolut;
+    // A singing bowl's voice: a low fundamental with inharmonic partials (about 1, 2.76, 5.4, 8.9 times), each a pair a
+    // few tenths of a hertz apart so the tone beats, a soft strike and a long fading hum.
+    function ring() {
+      const Ctx = window.AudioContext || window.webkitAudioContext; if (!Ctx) return;
+      const ac = new Ctx(), now = ac.currentTime, out = ac.createGain();
+      out.gain.value = 0.32; out.connect(ac.destination);
+      [[1, 1, 9], [2.76, .5, 6], [5.4, .25, 4], [8.93, .12, 2.5]].forEach(([k, amp, dur]) => {
+        [0, 0.6].forEach(detune => {
+          const o = ac.createOscillator(), g = ac.createGain();
+          o.type = 'sine'; o.frequency.value = 196 * k + detune;
+          g.gain.setValueAtTime(0, now);
+          g.gain.linearRampToValueAtTime(amp / 2, now + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+          o.connect(g); g.connect(out); o.start(now); o.stop(now + dur + 0.1);
+        });
+      });
+      setTimeout(() => ac.close(), 10000);
+    }
+    bowl.addEventListener('click', () => {
+      ring();
+      box.classList.remove('ringing'); void box.offsetWidth; box.classList.add('ringing');
+      // the bowl sounds first, then gives way to the panel
+      setTimeout(() => { box.classList.add('giving'); panel.setAttribute('aria-hidden', 'false'); bowl.setAttribute('aria-hidden', 'true'); }, 1300);
+    });
+    box.querySelector('.back').addEventListener('click', () => {
+      box.classList.remove('giving', 'ringing'); panel.setAttribute('aria-hidden', 'true'); bowl.removeAttribute('aria-hidden');
+    });
+  })();
+  </script>
+</section>
+
+
+<footer>
+  <div class="wrap">
+    Sony Remote (Mantra) · Mantra Productions · Marko Boško. In design, not yet available.
+    Sony, Alpha and Accsoon CineView are trademarks of their owners; this app is independent of them.
+    As an Amazon Associate I earn from qualifying purchases: the Amazon links on this page are affiliate links.
+    The photographs are illustrations made with Google's Nano Banana; the app does not exist yet.
+  </div>
+</footer>
+
+<script>
+// The drawn app: just enough behaviour to feel the keys. No app logic lives here.
+(function () {
+  const bodies = { 1: 'A7 V', 2: 'a6600', 3: 'A7 IV' };
+  const shots = { 1: 'WIDE', 2: 'HANDS', 3: 'FACE' };
+  let cam = 1, viaAccsoon = { 1: false, 2: true, 3: false }, rolling = false, pgm = 1, pvw = 2, t0 = 0;
+
+  // --- the camera rail ---
+  const rail = document.getElementById('camRail');
+  const stagePic = document.querySelector('#railStage .pic');
+  const line = document.getElementById('railLine');
+  const src = document.getElementById('srcKey');
+  function drawRail() {
+    const accsoon = viaAccsoon[cam];
+    rail.querySelectorAll('[data-cam]').forEach(k => {
+      const n = +k.dataset.cam;
+      if (k.classList.contains('dead')) return;
+      k.classList.toggle('on', n === cam);
+      k.classList.toggle('tally', n === pgm);
+    });
+    stagePic.className = 'pic s' + cam;
+    stagePic.querySelector('.lbl').textContent = 'CAM ' + cam + ' · ' + shots[cam] + (accsoon ? ' · HDMI' : '');
+    src.innerHTML = accsoon ? 'ACCS<small>hdmi</small>' : 'SONY<small>direct</small>';
+    document.querySelectorAll('#railPhone .rail:last-child .key').forEach(k => {
+      const wifiOnly = /^(ISO|SHTR|IRIS)/.test(k.textContent);
+      k.classList.toggle('dead', accsoon && wifiOnly);
+    });
+    line.textContent = accsoon
+      ? 'CAM' + cam + ' · ' + bodies[cam] + ' · Accsoon · HDMI 1080p25 · keys over Bluetooth'
+      : 'CAM' + cam + ' · ' + bodies[cam] + ' · Sony direct · 25 fps · ISO 800 · 1/50 · f/2.8';
+  }
+  rail.addEventListener('click', e => {
+    const k = e.target.closest('[data-cam]');
+    if (k && !k.classList.contains('dead')) { cam = +k.dataset.cam; drawRail(); }
+  });
+  src.addEventListener('click', () => { viaAccsoon[cam] = !viaAccsoon[cam]; drawRail(); });
+  document.getElementById('mvKey').addEventListener('click', () => document.getElementById('multiview').scrollIntoView());
+  document.getElementById('railStage').addEventListener('dblclick', () => { viaAccsoon[cam] = !viaAccsoon[cam]; drawRail(); });
+  const recKey = document.getElementById('recKey'), tc = document.getElementById('railTc');
+  recKey.addEventListener('click', () => { rolling = !rolling; t0 = Date.now(); recKey.classList.toggle('rolling', rolling); tc.classList.toggle('rolling', rolling); });
+  setInterval(() => {
+    if (!rolling) return;
+    const s = Math.floor((Date.now() - t0) / 1000), f = Math.floor(((Date.now() - t0) % 1000) / 40);
+    const p = n => String(n).padStart(2, '0');
+    tc.innerHTML = '<i>REC</i> ' + p(Math.floor(s / 3600)) + ':' + p(Math.floor(s / 60) % 60) + ':' + p(s % 60) + ':' + p(f);
+  }, 40);
+
+  // --- multiview ---
+  const quad = document.getElementById('quad'), two = document.getElementById('two');
+  const mvRail = document.getElementById('mvRail');
+  let mode = 'quad';
+  function drawMv() {
+    quad.querySelectorAll('.tile[data-cam]').forEach(t => {
+      const n = +t.dataset.cam;
+      t.classList.toggle('pgm', n === pgm);
+      t.classList.toggle('pvw', n === pvw && n !== pgm);
+    });
+    document.getElementById('pgmPic').className = 'pic s' + pgm;
+    document.getElementById('pgmName').textContent = 'PGM · CAM' + pgm;
+    document.querySelector('#pvwTile .pic').className = 'pic s' + pvw;
+    document.querySelector('#pvwTile .name').textContent = 'PREVIEW · CAM' + pvw;
+    document.querySelector('#pgmTile .pic').className = 'pic s' + pgm;
+    document.querySelector('#pgmTile .name').textContent = 'PROGRAM · CAM' + pgm;
+    mvRail.querySelectorAll('[data-cam]').forEach(k => {
+      const n = +k.dataset.cam;
+      k.classList.toggle('on', n === pvw && n !== pgm);
+      k.classList.toggle('tally', n === pgm);
+      k.classList.toggle('dead', mode === 'two' && n === 3);
+    });
+    drawRail();
+  }
+  function pick(n) { if (n !== pgm && !(mode === 'two' && n === 3)) { pvw = n; drawMv(); } }
+  quad.addEventListener('click', e => { const t = e.target.closest('.tile[data-cam]'); if (t) pick(+t.dataset.cam); });
+  mvRail.addEventListener('click', e => { const k = e.target.closest('[data-cam]'); if (k && !k.classList.contains('dead')) pick(+k.dataset.cam); });
+  function cut() { const o = pgm; pgm = pvw; pvw = o; drawMv(); }
+  document.getElementById('cutKey').addEventListener('click', cut);
+  document.getElementById('autoKey').addEventListener('click', () => {
+    const p = document.getElementById(mode === 'two' ? 'pgmTile' : 'pgmPic');
+    p.style.opacity = 0; setTimeout(() => { cut(); p.style.opacity = 1; }, 250);
+  });
+  document.getElementById('mvMode').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    mode = b.dataset.m;
+    document.querySelectorAll('#mvMode button').forEach(x => x.classList.toggle('chosen', x === b));
+    quad.hidden = mode !== 'quad'; two.hidden = mode !== 'two';
+    if (mode === 'two') { if (pgm === 3) pgm = 1; if (pvw === 3 || pvw === pgm) pvw = pgm === 1 ? 2 : 1; }
+    drawMv();
+  });
+  drawMv();
+})();
+</script>
+</body>
+</html>

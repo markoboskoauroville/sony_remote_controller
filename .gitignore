@@ -1,0 +1,38 @@
+# --- secrets: never commit ---
+*token*
+*.token
+*_token.txt
+.env
+.env.*
+secrets.properties
+local.properties
+gh_token*
+github_token*
+
+# --- NDI SDK: licensed, not ours to redistribute ---
+app/src/main/jniLibs/
+app/src/main/cpp/ndi/
+
+# --- android / gradle ---
+*.iml
+.gradle/
+.idea/
+.DS_Store
+/build
+app/build/
+/captures
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+signing/*
+groq*
+*api*.txt
+gsk_*
+logs/
+
+# --- kept on this Mac only (14.11.2026, repo public): third-party reference copies, incl. Sony's
+# --- Camera Remote Command (personal-use licence), unlicensed projects and a private repo's code
+reference/
+__pycache__/
+*.pyc

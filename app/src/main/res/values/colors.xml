@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Mantra palette, as in mantra-ndi: fixed across every Mantra app. Colour is the state channel. -->
+<resources>
+    <color name="ink">#0B0D10</color>
+    <color name="surface">#141A21</color>
+    <color name="slate">#23303D</color>
+    <color name="sand">#F2DDB4</color>
+    <color name="amber">#F59E0B</color>
+    <color name="quiet">#6E7A86</color>
+    <color name="fault">#EF4444</color>
+</resources>

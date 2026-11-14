@@ -1,0 +1,51 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Sony A7 V: PP1 for the most colour and dynamic range</title>
+<style>
+@page{size:A4;margin:16mm}
+body{font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1d1d1f;font-size:11pt;line-height:1.4}
+h1{font-size:19pt;margin:0 0 2mm}
+h2{font-size:13pt;margin:7mm 0 2mm;color:#8a4b08}
+p.sub{color:#555;margin:0 0 5mm}
+table{border-collapse:collapse;width:100%;margin-bottom:3mm}
+th,td{border:1px solid #c9c9c9;padding:2.2mm 2.5mm;vertical-align:top;text-align:left}
+th{background:#f3eee6}
+td:first-child{width:7mm;text-align:center;font-weight:700}
+.path{font-weight:600}
+.note{background:#faf6ee;border-left:3px solid #d08a2b;padding:3mm 4mm;margin:4mm 0}
+small{color:#666}
+</style></head><body>
+<h1>Sony A7 V: Picture Profile 1 for the most colour and dynamic range</h1>
+<p class="sub">Mantra Sony Remote · 28.10.2026 · menus as on the A7 IV generation; if a name differs on the A7 V, the place is the same</p>
+
+<div class="note">A Picture Profile stores only the <b>look</b> (gamma, colour space, colour settings). File format, bit depth, ISO and exposure live in other menus. Step 15 stores everything together on <b>position 1 of the mode dial</b>.</div>
+
+<h2>Part A: Picture Profile 1 (the look)</h2>
+<table><tr><th>#</th><th>Where</th><th>Set to</th></tr>
+<tr><td>1</td><td class="path">MENU → Exposure/Color (purple tab) → Color/Tone → Picture Profile → highlight PP1, press right</td><td>opens PP1's settings</td></tr>
+<tr><td>2</td><td class="path">PP1 → Gamma</td><td><b>S-Log3</b>: the most dynamic range</td></tr>
+<tr><td>3</td><td class="path">PP1 → Color Mode</td><td><b>S-Gamut3.Cine</b>: wide and easy to grade (S-Gamut3 for the very widest)</td></tr>
+<tr><td>4</td><td class="path">PP1 → Black Level, Saturation, Color Phase, Color Depth</td><td>all <b>0</b></td></tr>
+<tr><td>5</td><td class="path">PP1 → Detail</td><td><b>−7</b> (least in-camera sharpening)</td></tr>
+<tr><td>6</td><td class="path">PP1 → Black Gamma, Knee</td><td>leave: S-Log3 switches them off</td></tr>
+<tr><td>7</td><td class="path">Back on the Picture Profile list: PP1, middle button</td><td>PP1 <b>in use</b></td></tr>
+</table>
+
+<h2>Part B: the recording (not stored in PP1)</h2>
+<table><tr><th>#</th><th>Where</th><th>Set to</th></tr>
+<tr><td>8</td><td class="path">MENU → Shooting (red tab) → Image Quality/Rec → File Format (movie)</td><td><b>XAVC S-I 4K</b> (best, large files) or <b>XAVC HS 4K</b> (H.265, smaller)</td></tr>
+<tr><td>9</td><td class="path">Same group → Movie Settings → Record Setting</td><td>a <b>10bit 4:2:2</b> option</td></tr>
+<tr><td>10</td><td class="path">Same group → Rec Frame Rate</td><td>the project's rate, e.g. <b>25p</b></td></tr>
+<tr><td>11</td><td class="path">Shutter (dial or MENU → Exposure/Color → Exposure)</td><td><b>1/50</b> at 25p (twice the frame rate)</td></tr>
+<tr><td>12</td><td class="path">MENU → Exposure/Color → Exposure → ISO</td><td><b>800</b>, manual (S-Log3's lowest)</td></tr>
+<tr><td>13</td><td class="path">MENU → Exposure/Color → Zebra Display: On · Zebra Level: 94+</td><td>expose <b>+1 to +1.7 stops</b> over the meter; brightest skin just starts to show zebra</td></tr>
+<tr><td>14</td><td class="path">MENU → Setup (yellow) → Display Option → Gamma Disp. Assist: On · Gamma Disp. Assist Typ.: Auto</td><td>the screen looks normal, the file stays log</td></tr>
+</table>
+
+<h2>Part C: store it all</h2>
+<table><tr><th>#</th><th>Where</th><th>Set to</th></tr>
+<tr><td>15</td><td class="path">MENU → Shooting → Shooting Mode → Camera Set. Memory → 1 → OK</td><td>PP1 + file format + ISO + zebra saved; mode dial to <b>1</b> recalls all</td></tr>
+</table>
+
+<h2>In DaVinci Resolve</h2>
+<p>Colour Space Transform: input <b>S-Gamut3.Cine / S-Log3</b> → output <b>Rec.709 / Gamma 2.4</b> (or through DaVinci Wide Gamut first), then grade.</p>
+<p><small>ISO 800 and the +1 to +1.7 stops are general Sony S-Log3 practice, not yet measured on this A7 V. Sony's Camera Control PTP 3 lets a program set every value of Part A, the ISO, the zebra and the gamma assist over USB or the network (properties 0xD0E0–0xD0F5, 0xD23F, 0xD21E); the Mantra Sony Remote will do this by itself once the camera is connected.</small></p>
+</body></html>

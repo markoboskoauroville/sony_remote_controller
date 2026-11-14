@@ -1,0 +1,38 @@
+name: Deploy to Cloudflare Pages
+# Since 1.11.2026 (MANTRA_MANIFEST download-always-latest.md) the Build workflow deploys the page itself, on every push to
+# the default branch, right after the release, with the released APK at download/SonyRemote.apk. This workflow is only a
+# hand redeploy (Actions → Run workflow): the page as committed, with the release of the version in gradle.properties.
+# It no longer runs on push: the page in git holds no APK, and two deploys of one push would race.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check credentials are present
+        id: creds
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::notice::Cloudflare secrets not set, skipping deploy."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy with the released APK
+        if: steps.creds.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          V=$(grep -oP '^appVersion=\K\d+' gradle.properties)
+          mkdir -p released && gh release download "v$V" --pattern "$V-sony-remote-v$V.apk" --dir released --clobber
+          D=$(gh release view "v$V" --json publishedAt --jq .publishedAt | cut -c1-10 | awk -F- '{printf "%d.%d.%s", $3, $2, $1}')
+          bash tools/publish_page.sh "released/$V-sony-remote-v$V.apk" "$V" "$D"
