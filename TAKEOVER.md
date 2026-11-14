@@ -77,4 +77,20 @@ should use the Sony as a UVC camera. Fix (v29): the filter, the meta-data and `r
 the app opens the Sony's USB interface unless Marko opens TC Jam himself (it then asks USB permission as before). Bluetooth
 remote unchanged. No receiver or service claims USB in the background (only the in-activity permission receiver).
 Branch: `main` created from ccr-7270d80e-knr8l8 and made the GitHub default; build.yml runs on push to main and marks the
-release Latest. Left over, not deleted: ccr-7270d80e-knr8l8, claude/compassionate-volta-sqmlza. No updater (checkAtStart) yet.
+release Latest. (The two old branches were deleted later that day, see below.) No updater (checkAtStart) yet.
+
+## 14.11.2026 (evening): the repository is public, one fresh root commit, v29 built
+Marko: "Everything. What is building goes public? Go public." Private builds were stopped by billing, so the repo was made
+public after the three checks of MANTRA_MANIFEST building-repos-public.md (patterns, exact values against the local key store,
+a fresh clone): clean. Before that:
+- `reference/` (Sony's Camera Remote Command under a personal-use licence, unlicensed third-party copies, Sony's PTP 3 PDF,
+  code from the private CINEVIEW_VIEWER) left git and is gitignored; it stays on the Mac (see *Local only* at the top).
+- `signing/test-builds.p12` left git; the key, its password and alias are the repository secrets SIGNING_KEYSTORE_B64,
+  SIGNING_STORE_PASSWORD, SIGNING_KEY_ALIAS. build.yml writes the key from the secret; app/build.gradle.kts reads the two
+  values from the environment, or from signing/signing.properties on the Mac. The same key, so v29 installs over v28.
+- tools/__pycache__ untracked. History rewritten to ONE root commit (author: the GitHub no-reply address), main force-pushed,
+  the branches ccr-7270d80e-knr8l8 and claude/compassionate-volta-sqmlza deleted, tags v28/v1 moved to the new root.
+  The old history is kept only as a local git bundle, never pushed.
+- First run failed (`java.util` shadowed by Gradle's `java` extension: import java.util.Properties fixed it); then green:
+  https://github.com/markoboskoauroville/sony_remote_controller/actions/runs/43637922124, v29 released and marked Latest,
+  the page updated by the workflow.

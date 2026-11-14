@@ -48,3 +48,8 @@
   plugged in. If another app should own the device (Manual Camera uses the Sony as UVC), keep the filter out: the app lists
   and asks permission only when the user opens it.
 - Marko's repos have one branch, `main`; this repo started on a ccr- branch and was moved to main on 14.11.2026.
+- (evening) Going public: a third-party folder that is "read only" for us (no licence, Sony's personal-use package, a private
+  repo's code) cannot be in a public repo, not even unbuilt; keep it local and gitignored, and say where it lives in TAKEOVER.
+- A key alias can equal the password: move the alias out of the tracked build file together with the password.
+- In app/build.gradle.kts, `java.util.Properties()` does not resolve (`java` is the Java extension there): `import java.util.Properties`.
+- Moving tags matters when rewriting history: a release tag on an old commit keeps the whole old history reachable.
