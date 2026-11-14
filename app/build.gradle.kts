@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -10,12 +12,12 @@ val appVersion = (project.findProperty("appVersion") as String).toInt()
 // SIGNING_KEYSTORE_B64 and passes SIGNING_STORE_PASSWORD and SIGNING_KEY_ALIAS. On the Mac they stay local in signing/
 // (gitignored): test-builds.p12 and signing.properties (storePassword=..., keyAlias=...).
 val keystoreFile = rootProject.file("signing/test-builds.p12")
-val signingProps = java.util.Properties().apply {
+val signingProps = Properties().apply {
     val f = rootProject.file("signing/signing.properties")
     if (f.exists()) f.inputStream().use { load(it) }
 }
-val storePass: String = System.getenv("SIGNING_STORE_PASSWORD") ?: signingProps.getProperty("storePassword") ?: ""
-val keyAliasName: String = System.getenv("SIGNING_KEY_ALIAS") ?: signingProps.getProperty("keyAlias") ?: ""
+val storePass: String = System.getenv("SIGNING_STORE_PASSWORD") ?: signingProps.getProperty("storePassword", "")
+val keyAliasName: String = System.getenv("SIGNING_KEY_ALIAS") ?: signingProps.getProperty("keyAlias", "")
 
 android {
     namespace = "com.mantraproductions.sonyremote"
