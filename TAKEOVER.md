@@ -94,3 +94,8 @@ a fresh clone): clean. Before that:
 - First run failed (`java.util` shadowed by Gradle's `java` extension: import java.util.Properties fixed it); then green:
   https://github.com/markoboskoauroville/sony_remote_controller/actions/runs/43637922124, v29 released and marked Latest,
   the page updated by the workflow.
+
+## 15.11.2026: the Mac side is its own repository
+Sony Remote (Mantra) for the Mac (record the α7 V on its card from the Mac over Wi-Fi, PTP-IP through the camera's SSH
+Access Authentication, door 127.0.0.1:8881) lives in markoboskoauroville/SONY_REMOTE_MAC (~/Developer/SONY_REMOTE_MAC).
+It is written from the same Camera Remote Command documents in reference/sony-official, which stay here, local only.
