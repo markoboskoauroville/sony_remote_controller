@@ -182,7 +182,7 @@ experiment.
 
 Marko often shoots with **three or more Sonys, an Accsoon CineView Nano on each**. The app holds several
 cameras at once and switches between them with one key. Visualised first at
-**https://mantrasonyremote.pages.dev** (source `site/public/`); no app code for this yet.
+**https://sonyremote.markobosko.org** (source `site/public/`); no app code for this yet.
 Research of 22.10.2026 below; **H** = vendor docs or source, **M** = secondary or inferred, **L** = thin.
 
 ### The camera rail
@@ -400,4 +400,4 @@ decision (keep / change / drop).
 | Date | Step | Tried | Result on real equipment | Decision |
 |---|---|---|---|---|
 | 22.10.2026 | 0 | the stage: Mantra rails, double-tap SOURCES, FULL | built, 11 unit tests pass; not yet on the phone | waiting for Marko |
-| 22.10.2026 | page | multi-camera visualised on mantrasonyremote.pages.dev: CAM rail, 2×2 multiview, 2-camera switcher, topology, tiers | drawn, not yet seen by Marko | waiting for Marko |
+| 22.10.2026 | page | multi-camera visualised on sonyremote.markobosko.org: CAM rail, 2×2 multiview, 2-camera switcher, topology, tiers | drawn, not yet seen by Marko | waiting for Marko |

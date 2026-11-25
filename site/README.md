@@ -1,4 +1,4 @@
-# The page: mantrasonyremote.pages.dev
+# The page: sonyremote.markobosko.org
 
 The app drawn before it is built (Marko, 22.10.2026: "first a web page, no app code yet"). Static files in
 `public/`. Candle language for the page (MANTRA_MANIFEST language-candle.md); the app's screens inside it are drawn

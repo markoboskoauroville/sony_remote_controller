@@ -4,10 +4,10 @@
 `ccr-7270d80e-knr8l8` (the default). Step 0 built in the cloud (11 unit tests, assembleDebug), not yet on a phone.
 Moved to the Mac session ("DaVinci Resolve Router and Monitor") on 22.10.2026 at Marko's word.
 
-**Now: visualisation before code, done (22.10.2026 evening).** https://mantrasonyremote.pages.dev (`site/`): the CAM
+**Now: visualisation before code, done (22.10.2026 evening).** https://sonyremote.markobosko.org (`site/`): the CAM
 rail, the 2×2 multiview, the 2-camera switcher, the network, the tiers, the road; five Nano Banana photographs (hero,
 CAM1 wide, CAM2 hands, CAM3 singer, kit); the kit with 8 Amazon.de affiliate links (markomantresh-21; site registered
-in PartnerNet by Marko). Card 14 "KAMERA" on markobosko.pages.dev (concept). Sony's Camera Remote Command 2.02.00 is in
+in PartnerNet by Marko). Card 14 "KAMERA" on markobosko.org (concept). Sony's Camera Remote Command 2.02.00 is in
 reference/sony-official, on the Mac only (see *Local only* below). Marko: *"Looks fantastic."*
 
 **Next:** Step 0 on the Pixel 7 emulator (check its GitHub build first), then Marko's phone; then Step 1, the A7 V.
@@ -39,7 +39,7 @@ for pinch zoom and pan, reads the time code nearest the draggable box), Ltc.kt (
 - Opening the app from its icon never jams; a plug-in, the USB key or `--es tc HH:MM:SS:FF` does. Test doors: `--es tc`,
   `--ez read true` (opens the reader).
 - Clap: 1, 2, 3 kHz 300 ms each 500 ms apart, then the chord; torch one frame (40 ms) with each; white slate at the chord.
-- Beta on mantrasonyremote.pages.dev at **download/SonyRemote.apk**, an address with no version (since 1.11.2026,
+- Beta on sonyremote.markobosko.org at **download/SonyRemote.apk**, an address with no version (since 1.11.2026,
   MANTRA_MANIFEST download-always-latest.md). arm64 only (21 MB, under Pages' 25 MB). No APK in git any more.
 Not verified: LTC with a decoder; the a7 V's own REC button report; the clap timing against picture.
 
